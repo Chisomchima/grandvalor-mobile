@@ -1,9 +1,12 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { useSelector } from "react-redux";
+import { TouchableOpacity, Text } from "react-native";
 
-const Carts = () => {
+const Carts = ({ setModalVisible }) => {
+  const items = useSelector((state) => state.cart);
+
   return (
-    <View
+    <TouchableOpacity
       style={{
         position: "absolute",
         bottom: 10,
@@ -18,17 +21,18 @@ const Carts = () => {
         borderRadius: 5,
         justifyContent: "space-between",
       }}
+      onPress={() => setModalVisible(true)}
     >
       <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-        0
+        {items?.quantity}
       </Text>
       <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
         View Cart
       </Text>
       <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
-        NGN 10000
+        NGN {items?.total}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

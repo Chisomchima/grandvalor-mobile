@@ -1,19 +1,15 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import { reset, removeProduct, decreaseProduct, addProduct, increaseProduct } from "../redux/cartRedux";
+import {  addProduct } from "../redux/cartRedux";
 
 const ProductRows = ({ prod }) => {
-  const items = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const addItem = (item) => {
-    dispatch(increaseProduct(item));
+    dispatch(addProduct(item));
 };
 
-const removeItem = () => {
-  dispatch(decreaseProduct());
-};
 
 
   return (
@@ -50,7 +46,7 @@ const removeItem = () => {
             NGN {prod.price}
           </Text>
           <TouchableOpacity>
-          <View
+          {/* <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -100,7 +96,7 @@ const removeItem = () => {
               +
             </Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
           <Text
             style={{
               padding: 10,
@@ -109,6 +105,7 @@ const removeItem = () => {
               color: "white",
               textAlign: "center",
             }}
+            onPress = {() => addItem (prod)}
           >
             Add to Cart
           </Text>

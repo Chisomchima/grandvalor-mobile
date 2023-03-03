@@ -1,38 +1,44 @@
 import React, { useLayoutEffect, useEffect, useState } from "react";
-import { View, ScrollView, Image, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Image,
+  Text,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import ProductRows from "../components/ProductRows";
+import CheckoutModal from "../components/checkoutModal";
 import Carts from "../components/Carts";
 import axios from "axios";
-import { reset, removeProduct, decreaseProduct, addProduct, increaseProduct } from "../redux/cartRedux";
+import { reset, addProduct } from "../redux/cartRedux";
 
 const ProductScreen = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const {
     params: { product },
   } = useRoute();
   const navigation = useNavigation();
   const [allProd, setAllProd] = useState(null);
-  const items = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const addItem = (item) => {
-      dispatch(increaseProduct(item));
+    dispatch(addProduct(item));
   };
-
-  const removeItem = () => {
-    dispatch(decreaseProduct());
-};
- 
 
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const res = await axios.get("https://grandvalor-api.onrender.com/api/products");
+        const res = await axios.get(
+          "https://grandvalor-api.onrender.com/api/products"
+        );
         setAllProd(res.data);
-        dispatch(reset())
+        dispatch(reset());
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
     };
     getProducts();
@@ -53,7 +59,22 @@ const ProductScreen = () => {
         paddingBottom: 50,
       }}
     >
-      <Carts />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <CheckoutModal
+          setModalVisible={setModalVisible}
+          modalVisible={modalVisible}
+        />
+      </Modal>
+
+      <Carts setModalVisible={setModalVisible} />
       <ScrollView>
         <View>
           <Image
@@ -73,71 +94,6 @@ const ProductScreen = () => {
           <Text style={{ fontWeight: "bold", marginTop: 5, fontSize: 12 }}>
             NGN {product.price}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "flex-start",
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                backgroundColor: "black",
-                margin: 10,
-                alignItems: "center",
-                justifyContent: "center",
-                width: 40,
-                height: 40,
-                borderRadius: 40 / 2,
-              }}
-            >
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color: "white",
-                  borderRadius: 50,
-                  textAlign: "center",
-                  fontSize: 30,
-                }}
-                onPress = {removeItem}
-              >
-                -
-              </Text>
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontWeight: "bold",
-                color: "black",
-                fontSize: 20,
-                textAlign: "center",
-              }}
-            >
-              {items.product.quantity || 0}
-            </Text>
-            <TouchableOpacity
-              style={{
-                margin: 10,
-                backgroundColor: "black",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 40,
-                height: 40,
-                borderRadius: 40 / 2,
-              }}
-              onPress={()=>addItem(product)}
-            >
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  color: "white",
-                  textAlign: "center",
-                  fontSize: 30,
-                }}
-              >
-                +
-              </Text>
-            </TouchableOpacity>
-          </View>
           <TouchableOpacity>
             <Text
               style={{
@@ -147,6 +103,7 @@ const ProductScreen = () => {
                 color: "white",
                 textAlign: "center",
               }}
+              onPress={() => addItem(product)}
             >
               Add to Cart
             </Text>
@@ -167,10 +124,7 @@ const ProductScreen = () => {
             View More Products
           </Text>
           {allProd?.map((prod) => (
-            <ProductRows
-              prod={prod}
-              key={prod._id}
-            />
+            <ProductRows prod={prod} key={prod._id} />
           ))}
         </View>
       </ScrollView>
